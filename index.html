@@ -16,11 +16,12 @@
 
   gtag('config', 'G-EQH955GC5X');
 </script>
+<script>
 /* =========================================================
    설정 — 배포 전에 여기만 바꾸면 됩니다
    ========================================================= */
 window.CONFIG = {
-  GTM_ID: 'GTM-XXXXXXX',          // 본인 GTM 컨테이너 ID로 교체 (예: GTM-ABC1234)
+  GTM_ID: 'GTM-xxxxxxx',          // 본인 GTM 컨테이너 ID로 교체 (예: GTM-ABC1234)
   CURRENCY: 'KRW',
   // 가상 가격 (주말 성인 1인 기준) — 메가박스 일반 2D·돌비시네마 관람료, 메가박스 VR 콘서트 판매가(3.1~3.3만 원) 참고
   PRICE: { '2D': 15000, '돌비시네마': 20000, 'VR 에디션': 35000 },
@@ -28,6 +29,7 @@ window.CONFIG = {
   PACKAGE_PRICE: 45000,           // 패키지 1인가: VR 에디션 + 리마스터링 2D 관람권 + 포토카드 세트 (따로 사면 50,000원)
   MOVIE: { id: 'JP1993_VR', name: '쥬라기 공원 VR 에디션', brand: 'MEGABOX(NPD 프로토타입)' }
 };
+
 
 /* dataLayer + GTM (GTM ID를 넣었을 때만 로드) */
 window.dataLayer = window.dataLayer || [];
