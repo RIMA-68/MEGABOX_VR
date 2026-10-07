@@ -113,7 +113,7 @@
       }
       .screen {
         display: none;
-        padding-bottom: 120px;
+        padding-bottom: calc(160px + env(safe-area-inset-bottom));
       }
       .screen.on {
         display: block;
@@ -647,7 +647,9 @@
         display: flex;
         flex-direction: column;
         gap: 6px;
-        align-items: center;
+        align-items: safe center;
+        overflow-x: auto;
+        padding-bottom: 4px;
       }
       .srow {
         display: flex;
@@ -661,8 +663,9 @@
         text-align: center;
       }
       .seat {
-        width: 28px;
-        height: 28px;
+        width: clamp(22px, calc((100vw - 136px) / 10), 28px);
+        height: clamp(22px, calc((100vw - 136px) / 10), 28px);
+        flex-shrink: 0;
         border-radius: 6px 6px 3px 3px;
         border: 1px solid #c9c4db;
         background: #fff;
@@ -1924,7 +1927,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 state.people +
                 "매 발급 (가상)</small><span>관람권 번호 " +
                 state.orderId.replace("MBVR", "MB2D") +
-                " · 원하는 2D 회차를 골라 관람권으로 예매해요</span></div>"
+                "<br>원하는 2D 회차를 골라 관람권으로 예매해요</span></div>"
               : "");
         }
         $("#btn_done_share").addEventListener("click", function () {
@@ -1972,7 +1975,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           }, 1800);
         }
 
+        function fitBottom() {
+          $$(".screen").forEach(function (sc) {
+            var bar = sc.querySelector(".bar");
+            if (bar && bar.offsetHeight)
+              sc.style.paddingBottom = bar.offsetHeight + 24 + "px";
+          });
+        }
+        if (window.ResizeObserver) {
+          var ro = new ResizeObserver(fitBottom);
+          $$(".bar").forEach(function (b) {
+            ro.observe(b);
+          });
+        }
+        window.addEventListener("resize", fitBottom);
+        window.addEventListener("hashchange", fitBottom);
+
         render();
+        fitBottom();
       })();
     </script>
   </body>
