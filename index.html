@@ -41,7 +41,7 @@
    설정 — 배포 전에 여기만 바꾸면 됩니다
    ========================================================= */
       window.CONFIG = {
-        GTM_ID: "GTM-F32P6HFM0C", // 본인 GTM 컨테이너 ID로 교체 (예: GTM-ABC1234)
+        GTM_ID: "GTM-TNJZR2HG", // GTM은 <head> 맨 위 스니펫에서 로드 (여기는 참고용)
         CURRENCY: "KRW",
         // 가상 가격 (주말 성인 1인 기준) — 메가박스 일반 2D·돌비시네마 관람료, 메가박스 VR 콘서트 판매가(3.1~3.3만 원) 참고
         PRICE: { "2D": 15000, 돌비시네마: 20000, "VR 에디션": 35000 },
@@ -54,22 +54,7 @@
         },
       };
 
-      /* dataLayer + GTM (GTM ID를 넣었을 때만 로드) */
       window.dataLayer = window.dataLayer || [];
-      (function () {
-        var id = window.CONFIG.GTM_ID;
-        if (!/^GTM-[A-Z0-9]+$/.test(id) || id === "GTM-XXXXXXX") return;
-        (function (w, d, s, l, i) {
-          w[l] = w[l] || [];
-          w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-          var f = d.getElementsByTagName(s)[0],
-            j = d.createElement(s),
-            dl = l != "dataLayer" ? "&l=" + l : "";
-          j.async = true;
-          j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-          f.parentNode.insertBefore(j, f);
-        })(window, document, "script", "dataLayer", id);
-      })();
     </script>
     <style>
       :root {
@@ -304,6 +289,46 @@
         justify-content: center;
         gap: 4px;
       }
+      .chip:disabled {
+        background: var(--bg2);
+        border-color: var(--line);
+        color: #aaa;
+        cursor: not-allowed;
+      }
+      .pkgnote {
+        margin-top: 12px;
+        background: var(--purple-tint);
+        border: 1px solid var(--purple);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 12.5px;
+        line-height: 1.55;
+        color: #444;
+      }
+      .pkgnote b {
+        display: block;
+        font-size: 14px;
+        color: var(--purple);
+        margin-bottom: 3px;
+      }
+      .pkgnote button {
+        margin-top: 6px;
+        padding: 0;
+        border: 0;
+        background: none;
+        font-size: 12px;
+        color: var(--sub);
+        text-decoration: underline;
+      }
+      .ticket .bd .vch {
+        grid-column: 1/-1;
+        background: var(--purple-tint);
+        border-radius: 8px;
+        padding: 10px 12px;
+      }
+      .ticket .bd .vch span {
+        font-size: 13px;
+      }
       .chip[aria-pressed="true"] {
         background: var(--purple);
         border-color: var(--purple);
@@ -428,6 +453,9 @@
         color: #444;
         line-height: 1.5;
         word-break: keep-all;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
       }
       .feat b {
         display: block;
@@ -1000,7 +1028,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div>
               <b>리마스터링 2D + VR 패키지</b
               ><span id="landing_pkg_desc"
-                >리마스터링 2D + VR 에디션 종합 2회 관람<br />포토카드
+                >VR 에디션 관람 + 리마스터링 2D 관람권<br />포토카드
                 세트</span
               >
             </div>
@@ -1015,7 +1043,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             id="btn_landing_book"
             data-ga="landing_book_click"
           >
-            VR 에디션 예매하기
+            예매하기
           </button>
         </div>
       </section>
@@ -1149,7 +1177,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             data-ga="seat_next_click"
             disabled
           >
-            결제하기
+            다음으로
           </button>
         </div>
       </section>
@@ -1454,12 +1482,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         }
 
         $("#landing_pkg_desc").innerHTML =
-          '리마스터링 2D + VR 에디션 종합 2회 관람<br>포토카드 세트 · <em class="pp">1인 ' +
+          'VR 에디션 관람 + 리마스터링 2D 관람권<br>포토카드 세트 · <em class="pp">1인 ' +
           won(C.PACKAGE_PRICE) +
           "</em>";
         $("#landing_vr_price").textContent = won(C.PRICE["VR 에디션"]);
         function pkgOk() {
-          return FORMATS[state.format].key !== "돌비시네마";
+          return FORMATS[state.format].key === "VR 에디션";
         }
         function pkgOn() {
           return state.pkg && pkgOk();
@@ -1554,6 +1582,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         /* ---------- 상영 선택 ---------- */
         function renderFormat() {
+          if (state.pkg && FORMATS[state.format].key !== "VR 에디션")
+            state.format = 2;
           var f = FORMATS[state.format];
           $("#formats").innerHTML = FORMATS.map(function (x, i) {
             return (
@@ -1563,7 +1593,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               (i === state.format) +
               '" data-i="' +
               i +
-              '">' +
+              '"' +
+              (state.pkg && x.key !== "VR 에디션" ? " disabled" : "") +
+              ">" +
               x.label +
               (x.isNew ? ' <span class="n">N</span>' : "") +
               "</button>"
@@ -1581,6 +1613,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   ? "새로 복원한 화질로 다시 만나는 일반관 상영이에요."
                   : "더 큰 화면과 입체 음향으로 감상하는 특별관 상영이에요.") +
                 "</p></div>";
+          if (state.pkg) {
+            $("#format_detail").insertAdjacentHTML(
+              "afterbegin",
+              '<div class="pkgnote"><b>' +
+                C.PACKAGE_NAME +
+                " 예매 중</b>VR 에디션 회차를 예매하면 인원수만큼 리마스터링 2D 관람권이 함께 발급돼요. 2D는 관람권으로 원하는 날짜·회차에 따로 예매해요." +
+                '<br><button id="btn_pkg_off" data-ga="package_off_click">패키지 없이 다른 상영 보기</button></div>',
+            );
+            $("#btn_pkg_off").onclick = function () {
+              state.pkg = false;
+              track("package_upgrade_toggle", {
+                package_on: false,
+                from: "format",
+              });
+              renderFormat();
+            };
+          }
           if (soldOut(state.date, f.key, state.time)) {
             for (var k = f.times.length - 1; k >= 0; k--) {
               if (!soldOut(state.date, f.key, k)) {
@@ -1787,18 +1836,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             state.people +
             "</div>" +
             (pkgOn()
-              ? "<div><span>패키지</span>" +
-                (f.key === "VR 에디션" ? "리마스터링 2D" : "VR 에디션") +
-                " 관람권 " +
+              ? "<div><span>패키지</span>리마스터링 2D 관람권 " +
                 state.people +
                 "매 + 포토카드 세트</div>"
               : "");
-          var other = f.key === "VR 에디션" ? "리마스터링 2D" : "VR 에디션";
           $("#pkg_desc").textContent = pkgOk()
-            ? other +
-              " 관람권 1매 추가 + 관람 인증 포토카드 세트 · 1인 +" +
+            ? "리마스터링 2D 관람권 1매(원하는 회차로 따로 예매) + 관람 인증 포토카드 세트 · 1인 +" +
               won(pkgAdd())
-            : "패키지는 2D·VR 에디션 상영에서 선택할 수 있어요";
+            : "패키지는 VR 에디션 상영에서만 선택할 수 있어요";
           $("#toggle_package").disabled = !pkgOk();
           $("#toggle_package").setAttribute("aria-pressed", pkgOn());
           $("#paymethods").innerHTML = PAYS.map(function (p, i) {
@@ -1842,6 +1887,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             screening_date: dateISO(),
             payment_type: PAYS[state.pay],
             entry_cta: state.entryCta,
+            package_on: pkgOn(),
             utm_source: utm.utm_source || "(direct)",
             utm_campaign: utm.utm_campaign || "(none)",
           });
@@ -1872,7 +1918,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             "</span></div>" +
             "<div><small>결제</small><span>" +
             won(total()) +
-            "</span></div>";
+            "</span></div>" +
+            (pkgOn()
+              ? '<div class="vch"><small>리마스터링 2D 관람권 · ' +
+                state.people +
+                "매 발급 (가상)</small><span>관람권 번호 " +
+                state.orderId.replace("MBVR", "MB2D") +
+                " · 원하는 2D 회차를 골라 관람권으로 예매해요</span></div>"
+              : "");
         }
         $("#btn_done_share").addEventListener("click", function () {
           var text = "쥬라기 공원 VR 에디션 보러 가요 #장면속으로";
